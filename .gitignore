@@ -1,0 +1,21 @@
+# Ignore history directory
+.history/
+
+# Ignore node_modules in frontend
+/frontend/node_modules/
+
+# Ignore build output in frontend
+/frontend/.nuxt/
+frontend/dist/
+
+
+# Ignore vendor directory in backend
+/backend/vendor/
+
+# Ignore log files
+/backend/storage/logs/*.log
+
+# Ignore cache files
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
