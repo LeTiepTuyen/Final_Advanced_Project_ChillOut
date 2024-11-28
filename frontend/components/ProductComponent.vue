@@ -5,7 +5,7 @@
     :id="`ProductComponent${product.id}`"
     class="bg-white inline-block rounded hover:shadow-[0_0_10px_3px_rgba(0,0,0,0.15)] cursor-pointer"
   >
-    <NuxtLink :to="`/item/${product.id}`">
+    <NuxtLink :to="`item/${product.id}`">
       <img class="rounded-t-lg object-cover" :src="product.url" :alt="product.title" />
       <div id="ProductDetails">
         <span class="flex items-center justify-start gap-3 px-1 pt-1">

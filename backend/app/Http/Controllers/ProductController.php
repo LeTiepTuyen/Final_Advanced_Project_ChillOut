@@ -49,15 +49,33 @@ class ProductController extends Controller
         return response()->json($products, 200);
     }
 
-    // Get product by ID
     public function getProductById($id)
-    {
+{
+    try {
+        // Tìm sản phẩm theo ID và nạp quan hệ 'images'
         $product = Product::with('images')->find($id);
 
+        // Nếu sản phẩm không tồn tại, trả về phản hồi 404
         if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
         }
 
-        return response()->json($product, 200);
+        // Trả về chi tiết sản phẩm
+        return response()->json([
+            'success' => true,
+            'data' => $product
+        ], 200);
+
+    } catch (\Exception $e) {
+        // Bắt các lỗi không mong muốn
+        return response()->json([
+            'success' => false,
+            'message' => 'Error fetching product',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 }

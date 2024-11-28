@@ -13,16 +13,19 @@
 <script setup>
 import MainLayout from "~/layouts/MainLayout.vue";
 import { useUserStore } from "~/stores/user";
+import axios from "../src/axiosClient";
+import { handleError } from "~/utils/errorHandler";
 const userStore = useUserStore();
 
 let products = ref(null);
 
 onBeforeMount(async () => {
   try {
-    products.value = await useFetch("/api/prisma/get-all-products");
+    const response = await axios.get("/products");
+    products.value = response.data;
     userStore.isLoading = false;
   } catch (error) {
-    console.error("Failed to fetch products:", error);
+    handleError(error);
   }
 });
 </script>
