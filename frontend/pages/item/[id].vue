@@ -78,6 +78,7 @@
 <script setup>
 import MainLayout from "~/layouts/MainLayout.vue";
 import { useUserStore } from "~/stores/user";
+import axios from "../src/axiosClient";
 const userStore = useUserStore();
 
 const route = useRoute();
@@ -87,11 +88,16 @@ let currentImage = ref(null);
 const images = ref([]);
 
 onBeforeMount(async () => {
-  product.value = await useFetch(`/api/prisma/get-product-by-id/${route.params.id}`);
+  try {
+    const response = await axios.get(`/products/${route.params.id}`);
+    product.value = response.data;
+  } catch (error) {
+    handleError("Failed to fetch product:", error);
+  }
 });
 
 watchEffect(() => {
-  if (product.value && product.value.data) {
+  if (product.value) {
     currentImage.value = product.value.data.url;
     images.value = product.value.data.images || [product.value.data.url]; // Use the images field from the product data
     userStore.isLoading = false;
@@ -99,25 +105,16 @@ watchEffect(() => {
 });
 
 const isInCart = computed(() => {
-  let res = false;
-  userStore.cart.forEach((prod) => {
-    if (route.params.id == prod.id) {
-      res = true;
-    }
-  });
-  return res;
+  return userStore.cart.some((prod) => route.params.id == prod.id);
 });
+
 
 const priceComputed = computed(() => {
-  if (product.value && product.value.data) {
-    return product.value.data.price / 100;
-  }
-  return "0.00";
+  return product.value ? product.value.data.price / 100 : 0.00;
 });
-
 
 
 const addToCart = () => {
-  userStore.cart.push(product.value.data);
+  userStore.cart.push(product.value);
 };
 </script>

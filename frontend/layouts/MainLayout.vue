@@ -186,10 +186,9 @@
 
 <script setup>
 import { useUserStore } from "~/stores/user";
+import axios from "../src/axiosClient";
 const userStore = useUserStore();
-const client = useSupabaseClient();
-const user = useSupabaseUser();
-import Swal from "sweetalert2";
+
 
 let isAccountMenu = ref(false);
 let isCartHover = ref(false);
@@ -199,11 +198,16 @@ let items = ref(null);
 
 const searchByName = useDebounce(async () => {
   isSearching.value = true;
-  items.value = await useFetch(
-    `/api/prisma/search-by-name/${searchItem.value}`
-  );
-  isSearching.value = false;
+  try {
+    const response = await axios.get(`/products?search=${searchItem.value}`);
+    items.value = response.data;
+  } catch (error) {
+    handleError("Failed to search products:", error);
+  } finally {
+    isSearching.value = false;
+  }
 }, 100);
+
 watch(
   () => searchItem.value,
   async () => {
