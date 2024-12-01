@@ -187,6 +187,7 @@
 <script setup>
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
+
 const userStore = useUserStore();
 
 
@@ -198,12 +199,13 @@ let items = ref(null);
 
 const searchByName = useDebounce(async () => {
   isSearching.value = true;
+  const searchItemValue = capitalizeWords(searchItem.value);
   try {
     const response = await axios.get(`/products/search`, {
-              params: {
-                name: searchItem.value,
-              },
-            });
+      params: {
+        name: searchItemValue,
+      },
+    });
     items.value = response.data;
   } catch (error) {
     handleError("Failed to search products:", error);
@@ -226,7 +228,16 @@ watch(
   }
 );
 
+
 const navigateToOrders = () => {
   router.push("/orders");
 };
+
+function capitalizeWords(sentence) {
+  if (!sentence) return ""; 
+  return sentence
+    .split(" ") 
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) 
+    .join(" "); 
+}
 </script>
