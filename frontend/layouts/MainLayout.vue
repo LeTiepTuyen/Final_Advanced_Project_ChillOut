@@ -199,7 +199,11 @@ let items = ref(null);
 const searchByName = useDebounce(async () => {
   isSearching.value = true;
   try {
-    const response = await axios.get(`/products?search=${searchItem.value}`);
+    const response = await axios.get(`/products/search`, {
+              params: {
+                name: searchItem.value,
+              },
+            });
     items.value = response.data;
   } catch (error) {
     handleError("Failed to search products:", error);
