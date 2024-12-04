@@ -73,7 +73,7 @@
                 </li>
                 <li
                   v-if="user"
-                  @click="client.auth.signOut()"
+                  @click="logout"
                   class="text-[13px] py-2 px-4 w-full hover:bg-gray-200"
                 >
                   Sign out
@@ -187,9 +187,32 @@
 <script setup>
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const user = ref(null);
+const router = useRouter();
 
+onMounted(async () => {
+  try {
+    const response = await axios.get('/profile');
+    user.value = response.data.data;
+  } catch (error) {
+    console.error('Failed to fetch user profile', error);
+  }
+});
+
+const logout = async () => {
+  try {
+    await axios.post('/logout');
+    user.value = null;
+    localStorage.removeItem('authToken'); // Remove token
+    router.push('/auth');
+  } catch (error) {
+    console.error('Logout failed', error);
+  }
+};
 
 let isAccountMenu = ref(false);
 let isCartHover = ref(false);
