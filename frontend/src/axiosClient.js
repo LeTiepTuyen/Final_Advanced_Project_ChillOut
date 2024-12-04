@@ -9,13 +9,25 @@ const axiosClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true, // Add this line to include credentials in requests
 });
 
 // Xử lý request nếu cần
 axiosClient.interceptors.request.use((config) => {
-    // Thêm token hoặc cấu hình khác vào header
-    // config.headers.Authorization = `Bearer ${token}`;
+    const tokenElement = document.querySelector('meta[name="csrf-token"]');
+    if (tokenElement) {
+        const token = tokenElement.getAttribute('content');
+        if (token) {
+            config.headers['X-CSRF-TOKEN'] = token;
+        }
+    }
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+        config.headers['Authorization'] = `Bearer ${authToken}`;
+    }
     return config;
+}, (error) => {
+    return Promise.reject(error);
 });
 
 // Xử lý response nếu cần
