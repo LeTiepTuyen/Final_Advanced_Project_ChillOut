@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductController;
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/products', [ProductController::class, 'getAllProducts']);
+Route::get('/{any}', function () {
+    return view('index');
+})->where('any', '.*');

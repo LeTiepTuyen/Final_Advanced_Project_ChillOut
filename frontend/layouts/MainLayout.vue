@@ -73,7 +73,7 @@
                 </li>
                 <li
                   v-if="user"
-                  @click="client.auth.signOut()"
+                  @click="logout"
                   class="text-[13px] py-2 px-4 w-full hover:bg-gray-200"
                 >
                   Sign out
@@ -186,10 +186,33 @@
 
 <script setup>
 import { useUserStore } from "~/stores/user";
+import axios from "../src/axiosClient";
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
 const userStore = useUserStore();
-const client = useSupabaseClient();
-const user = useSupabaseUser();
-import Swal from "sweetalert2";
+const user = ref(null);
+const router = useRouter();
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('/profile');
+    user.value = response.data.data;
+  } catch (error) {
+    console.error('Failed to fetch user profile', error);
+  }
+});
+
+const logout = async () => {
+  try {
+    await axios.post('/logout');
+    user.value = null;
+    localStorage.removeItem('authToken'); // Remove token
+    router.push('/auth');
+  } catch (error) {
+    console.error('Logout failed', error);
+  }
+};
 
 let isAccountMenu = ref(false);
 let isCartHover = ref(false);
@@ -199,11 +222,21 @@ let items = ref(null);
 
 const searchByName = useDebounce(async () => {
   isSearching.value = true;
-  items.value = await useFetch(
-    `/api/prisma/search-by-name/${searchItem.value}`
-  );
-  isSearching.value = false;
+  const searchItemValue = capitalizeWords(searchItem.value);
+  try {
+    const response = await axios.get(`/products/search`, {
+      params: {
+        name: searchItemValue,
+      },
+    });
+    items.value = response.data;
+  } catch (error) {
+    handleError("Failed to search products:", error);
+  } finally {
+    isSearching.value = false;
+  }
 }, 100);
+
 watch(
   () => searchItem.value,
   async () => {
@@ -218,7 +251,16 @@ watch(
   }
 );
 
+
 const navigateToOrders = () => {
   router.push("/orders");
 };
+
+function capitalizeWords(sentence) {
+  if (!sentence) return ""; 
+  return sentence
+    .split(" ") 
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) 
+    .join(" "); 
+}
 </script>

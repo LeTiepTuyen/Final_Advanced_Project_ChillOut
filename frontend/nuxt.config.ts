@@ -7,15 +7,8 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@pinia-plugin-persistedstate/nuxt",
     "@nuxtjs/tailwindcss",
-    "@nuxtjs/supabase",
-    "@nuxtjs/axios",
-    [
-      '@nuxtjs/axios',
-      {
-        baseURL: 'http://127.0.0.1:8000/api', // Laravel API base URL
-      }
-    ]
   ],
+
   runtimeConfig: {
     public: {
       stripePk: process.env.STRIPE_PK_KEY,
@@ -36,4 +29,3 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
 });
-
