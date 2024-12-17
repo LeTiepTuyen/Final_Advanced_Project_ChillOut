@@ -20,14 +20,14 @@
     </div>
     <img 
       class="rounded-md w-24 md:w-36" 
-      :src="product.url"
+      :src="product.data.url"
       alt="Product Image"
     >
     <div class="flex-1 pl-4">
       <div class="flex justify-between items-center mb-2">
         <div class="flex items-center space-x-2">
           <span class="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">Welcome Deal</span>
-          <div class="truncate text-xl font-semibold">{{ product.title }}</div>
+          <div class="truncate text-xl font-semibold">{{ product.data.title }}</div>
         </div>
         <button 
           @click="removeFromCart"
@@ -37,7 +37,7 @@
         </button>
       </div>
       <div class="text-xl font-semibold">
-        $ <span class="font-bold">{{ (product.price / 100).toFixed(2) }}</span>
+        $ <span class="font-bold">{{ (product.data.price / 100).toFixed(2) }}</span>
       </div>
       <p class="text-green-600 text-s font-semibold mt-1">
         Free 11-day delivery over ￡8.28
