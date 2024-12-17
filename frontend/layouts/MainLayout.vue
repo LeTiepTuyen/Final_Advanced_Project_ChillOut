@@ -221,12 +221,16 @@ let searchItem = ref("");
 let items = ref(null);
 
 const searchByName = useDebounce(async () => {
+  if (!searchItem.value.trim()) {
+    items.value = []; // Đặt items thành mảng trống nếu không có tìm kiếm
+    return;
+  }
   isSearching.value = true;
   const searchItemValue = capitalizeWords(searchItem.value);
   try {
     const response = await axios.get(`/products/search`, {
       params: {
-        name: searchItemValue,
+        search: searchItemValue,
       },
     });
     items.value = response.data;
@@ -240,14 +244,15 @@ const searchByName = useDebounce(async () => {
 watch(
   () => searchItem.value,
   async () => {
-    if (!searchItem.value) {
+    // Nếu không có giá trị trong ô tìm kiếm, reset danh sách sản phẩm
+    if (!searchItem.value.trim()) {
       setTimeout(() => {
-        items.value = "";
+        items.value = []; // Reset items thành mảng trống
         isSearching.value = false;
-        return;
       }, 500);
+      return;
     }
-    searchByName();
+    searchByName(); // Gọi hàm tìm kiếm nếu có giá trị
   }
 );
 

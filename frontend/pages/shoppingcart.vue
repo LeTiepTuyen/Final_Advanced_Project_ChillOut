@@ -232,7 +232,7 @@ const decreaseQuantity = (product) => {
           <div id="Items" class="bg-white rounded-lg p-4 mt-4 shadow-sm">
             <div
               v-for="product in userStore.cart"
-              :key="product.id"
+              :key="product.data.id"
               class="mb-4 relative"
             >
               <CartItem
@@ -320,7 +320,7 @@ const totalPrice = ref(0);
 const calculateTotalPrice = () => {
   let price = 0;
   userStore.cart.forEach((prod) => {
-    price += prod.price * prod.quantity;
+    price += prod.data.price * prod.quantity;
   });
   totalPrice.value = (price / 100).toFixed(2); // Sử dụng toFixed để định dạng số thập phân
 };
