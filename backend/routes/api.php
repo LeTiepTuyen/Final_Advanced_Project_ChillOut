@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Services\ErrorHandler;
+
 
 Route::get('/products', [ProductController::class, 'getAllProducts']);
 Route::get('/products/search', [ProductController::class, 'searchByName']);
@@ -16,6 +18,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
 });
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+
+// Demo 403 error
+Route::get('/admin', function () {
+    ErrorHandler::logAndAbortForbidden(
+        '403 Forbidden: Unauthorized access to admin route.',
+        'You do not have permission to access this page.'
+    );
+});
+
+// Demo 500 error
+Route::get('/test-500', function () {
+    \App\Services\ErrorHandler::logAndAbortServerError(
+        '500 Internal Server Error: Simulated error.',
+        'This is a simulated 500 error.'
+    );
+});
+
+
+
+
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
