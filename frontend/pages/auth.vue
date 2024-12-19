@@ -80,13 +80,13 @@
       localStorage.setItem('authToken', response.data.token); // Store token
       router.push('/'); // Redirect to homepage
     } catch (error) {
-      console.error('Login failed', error);
+      handleError('Login failed', error);
     }
   };
 
   const registerWithEmail = async () => {
     if (password.value !== confirmPassword.value) {
-      console.error('Passwords do not match');
+      handleError('Passwords do not match');
       return;
     }
     try {
@@ -94,12 +94,12 @@
         name: name.value,
         email: email.value,
         password: password.value,
-      });
+      }); 
       console.log('Register successful', response.data);
       localStorage.setItem('authToken', response.data.token); // Store token
       router.push('/'); // Redirect to homepage
     } catch (error) {
-      console.error('Register failed', error);
+      handleError('Register failed', error);
     }
   };
   </script>
