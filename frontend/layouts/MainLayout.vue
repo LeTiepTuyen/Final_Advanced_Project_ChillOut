@@ -228,7 +228,7 @@ const searchByName = useDebounce(async () => {
   isSearching.value = true;
   const searchItemValue = capitalizeWords(searchItem.value);
   try {
-    const response = await axios.get(`/products/search`, {
+    const response = await axios.get(`/products`, {
       params: {
         search: searchItemValue,
       },

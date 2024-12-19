@@ -6,58 +6,38 @@ use App\Services\ErrorHandler;
 use App\Services\LogHandler;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Http\Resources\ProductResource;
 
 class ProductController extends Controller
 {
+    /**
+     * Get all products with optional search functionality.
+     */
     public function getAllProducts(Request $request)
     {
-        LogHandler::logInfo('Fetching all products');
+        $search = $request->get('search', '');
+        LogHandler::logInfo('Fetching all products', ['search_term' => $search]);
 
         // Ensure the "products" table exists
         ErrorHandler::ensureTableExists('products');
 
-        $products = Product::all();
+        $products = Product::query()
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%$search%");
+            })
+            ->paginate(30);
 
         // Abort if no products found
-        ErrorHandler::abortIfEmpty($products, 'No products found');
+        // ErrorHandler::abortIfEmpty($products, 'No products found', ['search_term' => $search]);
 
-        LogHandler::logInfo('Products retrieved successfully', ['count' => $products->count()]);
+        LogHandler::logInfo('Products retrieved successfully', ['count' => $products->total()]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $products,
-            'count' => $products->count()
-        ], 200);
+        return ProductResource::collection($products);
     }
 
-    // Search products by name
-    public function searchByName(Request $request)
-    {
-        $name = $request->query('name', '');
-        LogHandler::logInfo('Searching products', ['search_term' => $name]);
-
-        // Validate query parameter
-        if (!$name) {
-            ErrorHandler::abortWithLog('Search term is missing', 'Search term is required');
-        }
-
-        // Ensure the "products" table exists
-        ErrorHandler::ensureTableExists('products');
-
-        $products = Product::where('title', 'LIKE', '%' . $name . '%')->take(5)->get();
-
-        // Abort if no products found
-        ErrorHandler::abortIfEmpty($products, 'No products found', ['search_term' => $name]);
-
-        LogHandler::logInfo('Products found', ['search_term' => $name, 'count' => $products->count()]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $products
-        ], 200);
-    }
-
-    // Get product by ID
+    /**
+     * Get a single product by ID.
+     */
     public function getProductById($id)
     {
         LogHandler::logInfo('Fetching product', ['product_id' => $id]);
@@ -75,9 +55,6 @@ class ProductController extends Controller
 
         LogHandler::logInfo('Product retrieved successfully', ['product_id' => $id]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $product
-        ], 200);
+        return new ProductResource($product);
     }
 }
