@@ -9,8 +9,7 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
-    // Get all products
-    public function getAllProducts()
+    public function getAllProducts(Request $request)
     {
         LogHandler::logInfo('Fetching all products');
 
