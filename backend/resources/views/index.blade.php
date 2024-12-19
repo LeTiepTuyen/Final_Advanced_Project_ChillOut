@@ -1,12 +1,15 @@
-
+<!-- resources/views/index.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <!-- ...existing code... -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- ...existing code... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel App</title>
 </head>
+
 <body>
-    <!-- ...existing code... -->
+    <h1>Welcome to Laravel</h1>
 </body>
+
 </html>

@@ -246,16 +246,18 @@ class ProductSeeder extends Seeder
             // Insert product data
             foreach ($products as $productData) {
                 // Validate required fields
-                if (!isset($productData['title']) || !isset($productData['description']) || 
-                    !isset($productData['short_description']) || !isset($productData['url']) || 
-                    !isset($productData['price']) || !isset($productData['images'])) {
+                if (
+                    !isset($productData['title']) || !isset($productData['description']) ||
+                    !isset($productData['short_description']) || !isset($productData['url']) ||
+                    !isset($productData['price']) || !isset($productData['images'])
+                ) {
                     throw new \Exception('Missing required product data fields');
                 }
 
                 // Create product
                 $product = Product::create([
                     'title' => $productData['title'],
-                    'description' => $productData['description'], 
+                    'description' => $productData['description'],
                     'short_description' => $productData['short_description'],
                     'url' => $productData['url'],
                     'price' => $productData['price'],
