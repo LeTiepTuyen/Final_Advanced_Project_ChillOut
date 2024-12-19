@@ -7,7 +7,7 @@ use App\Services\ErrorHandler;
 
 
 Route::get('/products', [ProductController::class, 'getAllProducts']);
-Route::get('/products/search', [ProductController::class, 'searchByName']);
+
 Route::get('/products/{id}', [ProductController::class, 'getProductById']);
 
 // User authentication routes
