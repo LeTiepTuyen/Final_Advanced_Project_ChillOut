@@ -2,93 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Address;
-use App\Services\ErrorHandler;
-use App\Services\LogHandler;
+use App\Http\Resources\AddressResource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AddressController extends Controller
 {
-    // Add a new address
-    public function addAddress(Request $request)
+    /**
+     * Get all addresses with optional search functionality.
+     */
+    public function index(Request $request)
     {
-        LogHandler::logInfo('Attempting to add a new address.', ['request_data' => $request->all()]);
+        $addresses = Address::query()
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%");
+            })
+            ->paginate(30);
 
-        // Validate the request
-        $data = $request->validate([
-            'userId' => 'required|string',
-            'name' => 'required|string',
+        Log::info('Addresses retrieved successfully', ['count' => $addresses->total()]);
+
+        return AddressResource::collection($addresses);
+    }
+
+    /**
+     * Get a single address by ID.
+     */
+    public function show($id)
+    {
+        $address = Address::findOrFail($id);
+
+        Log::info('Address retrieved successfully', ['address_id' => $id]);
+
+        return new AddressResource($address);
+    }
+
+    /**
+     * Create a new address.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|uuid',
+            'name' => 'required|string|max:255',
             'address' => 'required|string',
-            'zipcode' => 'required|string',
-            'city' => 'required|string',
-            'country' => 'required|string',
+            'zipcode' => 'required|string|max:10',
+            'city' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
         ]);
 
-        // Example: Forbidden condition (e.g., invalid userId format)
-        ErrorHandler::abortIfForbidden(!is_numeric($data['userId']), 'Invalid userId format.', ['userId' => $data['userId']]);
+        $address = Address::create($validated);
 
-        // Create the address
-        $address = Address::create($data);
+        Log::info('Address created successfully', ['address_id' => $address->id]);
 
-        LogHandler::logInfo('Address created successfully.', ['address_id' => $address->id, 'user_id' => $data['userId']]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $address
-        ], 201);
+        return new AddressResource($address);
     }
 
-    // Update an address
-    public function updateAddress(Request $request, $id)
+    /**
+     * Update an existing address.
+     */
+    public function update(Request $request, $id)
     {
-        LogHandler::logInfo('Attempting to update address.', ['address_id' => $id, 'request_data' => $request->all()]);
+        $address = Address::findOrFail($id);
 
-        // Validate the request
-        $data = $request->validate([
-            'name' => 'sometimes|string',
-            'address' => 'sometimes|string',
-            'zipcode' => 'sometimes|string',
-            'city' => 'sometimes|string',
-            'country' => 'sometimes|string',
+        $validated = $request->validate([
+            'user_id' => 'nullable|uuid',
+            'name' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+            'zipcode' => 'nullable|string|max:10',
+            'city' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
         ]);
 
-        // Find the address
-        $address = Address::find($id);
+        $address->update($validated);
 
-        ErrorHandler::abortIfNotFound($address, 'Address not found for update.', ['address_id' => $id]);
+        Log::info('Address updated successfully', ['address_id' => $address->id]);
 
-        // Forbidden condition example
-        ErrorHandler::abortIfForbidden(empty($data), 'No update data provided.', ['address_id' => $id]);
-
-        // Update the address
-        $address->update($data);
-
-        LogHandler::logInfo('Address updated successfully.', ['address_id' => $id]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $address
-        ], 200);
+        return new AddressResource($address);
     }
 
-    // Get address by user
-    public function getAddressByUser($userId)
+    /**
+     * Delete an address by ID.
+     */
+    public function destroy($id)
     {
-        LogHandler::logInfo('Fetching address for user.', ['user_id' => $userId]);
+        $address = Address::findOrFail($id);
 
-        // Example: Forbidden condition (e.g., invalid userId format)
-        ErrorHandler::abortIfForbidden(!is_numeric($userId), 'Invalid userId format.', ['user_id' => $userId]);
+        $address->delete();
 
-        // Retrieve the address
-        $address = Address::where('user_id', $userId)->first();
+        Log::info('Address deleted successfully', ['address_id' => $id]);
 
-        ErrorHandler::abortIfNotFound($address, 'Address not found for user.', ['user_id' => $userId]);
-
-        LogHandler::logInfo('Address retrieved successfully.', ['user_id' => $userId, 'address_id' => $address->id]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $address
-        ], 200);
+        return response()->json(['message' => 'Address deleted successfully']);
     }
 }

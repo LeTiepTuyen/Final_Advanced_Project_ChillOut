@@ -2,13 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Services\ErrorHandler;
 
 
-Route::get('/products', [ProductController::class, 'getAllProducts']);
-
-Route::get('/products/{id}', [ProductController::class, 'getProductById']);
+Route::apiResource('products', ProductController::class);
+Route::apiResource('addresses', AddressController::class);
+Route::apiResource('orders', OrderController::class);
 
 // User authentication routes
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register');

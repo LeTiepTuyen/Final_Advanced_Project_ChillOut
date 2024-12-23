@@ -10,7 +10,7 @@ class OrderItem extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'integer';
     public $incrementing = true;
-    
+
     protected $fillable = [
         'order_id',
         'product_id',

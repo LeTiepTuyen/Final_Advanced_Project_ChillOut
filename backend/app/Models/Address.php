@@ -10,7 +10,7 @@ class Address extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'integer';
     public $incrementing = true;
-    
+
     protected $fillable = [
         'user_id',
         'name',
