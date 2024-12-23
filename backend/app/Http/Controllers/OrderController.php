@@ -2,94 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\Product;
+use App\Http\Resources\OrderResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    // Shared log error function
-    private function logError($message, $context = [])
+    /**
+     * Get all orders with optional search functionality.
+     */
+    public function index(Request $request)
     {
-        Log::error($message, $context);
+        $orders = Order::query()
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%");
+            })
+            ->paginate(30);
+
+        Log::info('Orders retrieved successfully', ['count' => $orders->total()]);
+
+        return OrderResource::collection($orders);
     }
 
-    // Shared function to validate product IDs
-    private function validateProductIds($productIds)
+    /**
+     * Get a single order by ID.
+     */
+    public function show($id)
     {
-        $existingProducts = Product::whereIn('id', $productIds)->pluck('id');
+        $order = Order::findOrFail($id);
 
-        if ($existingProducts->count() !== $productIds->count()) {
-            $this->logError('Invalid product IDs provided', [
-                'product_ids_sent' => $productIds,
-                'valid_product_ids' => $existingProducts
-            ]);
-            abort(403, 'One or more product IDs are invalid'); // Changed from 400 to 403
-        }
+        Log::info('Order retrieved successfully', ['order_id' => $id]);
+
+        return new OrderResource($order);
     }
 
-    // Get all orders by user
-    public function getAllOrdersByUser($userId)
+    /**
+     * Create a new order.
+     */
+    public function store(Request $request)
     {
-        Log::info('Fetching all orders for user.', ['user_id' => $userId]);
-
-        $orders = Order::with(['orderItems.product'])->where('user_id', $userId)->get();
-
-        if ($orders->isEmpty()) {
-            Log::warning('No orders found for user.', ['user_id' => $userId]);
-            abort(404, 'No orders found');
-        }
-
-        Log::info('Orders fetched successfully.', ['user_id' => $userId, 'order_count' => $orders->count()]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $orders
-        ], 200);
-    }
-
-    // Create a new order
-    public function createOrder(Request $request)
-    {
-        Log::info('Attempting to create a new order.', ['request_data' => $request->all()]);
-
-        // Validate request data
-        $data = $request->validate([
-            'userId' => 'required|string',
-            'name' => 'required|string',
+        $validated = $request->validate([
+            'user_id' => 'required|uuid',
+            'name' => 'required|string|max:255',
             'address' => 'required|string',
-            'zipcode' => 'required|string',
-            'city' => 'required|string',
-            'country' => 'required|string',
-            'items' => 'required|array',
-            'items.*.productId' => 'required|integer',
+            'zipcode' => 'required|string|max:10',
+            'city' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
         ]);
 
-        // Validate product IDs
-        $productIds = collect($data['items'])->pluck('productId');
-        $this->validateProductIds($productIds);
+        $order = Order::create($validated);
 
-        // Create the order
-        $order = Order::create([
-            'user_id' => $data['userId'],
-            'name' => $data['name'],
-            'address' => $data['address'],
-            'zipcode' => $data['zipcode'],
-            'city' => $data['city'],
-            'country' => $data['country'],
+        Log::info('Order created successfully', ['order_id' => $order->id]);
+
+        return new OrderResource($order);
+    }
+
+    /**
+     * Update an existing order.
+     */
+    public function update(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $validated = $request->validate([
+            'user_id' => 'nullable|uuid',
+            'name' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+            'zipcode' => 'nullable|string|max:10',
+            'city' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
         ]);
 
-        // Create order items
-        foreach ($data['items'] as $item) {
-            $order->orderItems()->create(['product_id' => $item['productId']]);
-        }
+        $order->update($validated);
 
-        Log::info('Order created successfully.', ['order_id' => $order->id, 'user_id' => $data['userId']]);
+        Log::info('Order updated successfully', ['order_id' => $order->id]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $order->load('orderItems.product')
-        ], 201);
+        return new OrderResource($order);
+    }
+
+    /**
+     * Delete an order by ID.
+     */
+    public function destroy($id)
+    {
+        $order = Order::findOrFail($id);
+
+        $order->delete();
+
+        Log::info('Order deleted successfully', ['order_id' => $id]);
+
+        return response()->json(['message' => 'Order deleted successfully']);
     }
 }

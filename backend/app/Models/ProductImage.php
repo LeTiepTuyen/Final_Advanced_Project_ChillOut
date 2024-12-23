@@ -10,7 +10,7 @@ class ProductImage extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'integer';
     public $incrementing = true;
-    
+
     protected $fillable = [
         'product_id',
         'url',

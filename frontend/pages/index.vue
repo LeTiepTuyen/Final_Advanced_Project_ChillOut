@@ -14,7 +14,7 @@
 import MainLayout from "~/layouts/MainLayout.vue";
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
-import { handleError } from "~/utils/errorHandler";
+// import { handleError } from "~/utils/errorHandler";
 const userStore = useUserStore();
 
 let products = ref(null);
@@ -25,7 +25,8 @@ onBeforeMount(async () => {
     products.value = response.data;
     userStore.isLoading = false;
   } catch (error) {
-    handleError(error);
+    // handleError(error);
+    console.error("Failed to fetch products:", error);
   }
 });
 </script>

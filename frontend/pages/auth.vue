@@ -5,7 +5,7 @@
         <img width="170" src="/logo.png" alt="Logo" />
       </NuxtLink>
     </div>
-    
+
     <div class="max-w-[400px] mx-auto px-2">
       <button
         @click="login('google')"
@@ -24,9 +24,9 @@
       </button>
 
       <div class="text-center my-4">
-        <button @click="showLogin = true" :class="{'font-bold': showLogin}">Login</button>
+        <button @click="showLogin = true" :class="{ 'font-bold': showLogin }">Login</button>
         <span class="mx-2">/</span>
-        <button @click="showLogin = false" :class="{'font-bold': !showLogin}">Register</button>
+        <button @click="showLogin = false" :class="{ 'font-bold': !showLogin }">Register</button>
       </div>
 
       <form v-if="showLogin" @submit.prevent="loginWithEmail">
@@ -50,7 +50,13 @@
           <input v-model="password" type="password" placeholder="Password" class="w-full p-2 border rounded" required />
         </div>
         <div class="my-4">
-          <input v-model="confirmPassword" type="password" placeholder="Confirm Password" class="w-full p-2 border rounded" required />
+          <input
+            v-model="confirmPassword"
+            type="password"
+            placeholder="Confirm Password"
+            class="w-full p-2 border rounded"
+            required
+          />
         </div>
         <button type="submit" class="w-full p-2 bg-green-500 text-white rounded">Register</button>
       </form>
@@ -60,46 +66,49 @@
 
 <script setup>
 import axios from "../src/axiosClient";
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-const email = ref('');
-const password = ref('');
-const name = ref('');
-const confirmPassword = ref('');
+const email = ref("");
+const password = ref("");
+const name = ref("");
+const confirmPassword = ref("");
 const showLogin = ref(true);
 const router = useRouter();
 
 const loginWithEmail = async () => {
   try {
-    const response = await axios.post('/login', {
+    const response = await axios.post("/login", {
       email: email.value,
       password: password.value,
     });
-    console.log('Login successful', response.data);
-    localStorage.setItem('authToken', response.data.token); // Store token
-    router.push('/'); // Redirect to homepage
+    console.log("Login successful", response.data);
+    localStorage.setItem("authToken", response.data.token); // Store token
+    router.push("/"); // Redirect to homepage
   } catch (error) {
-    handleError('Login failed', error);
+    // handleError("Login failed", error);
+    console.error("Login failed", error);
   }
 };
 
 const registerWithEmail = async () => {
   if (password.value !== confirmPassword.value) {
-    handleError('Passwords do not match');
+    // handleError("Passwords do not match");
+    console.error("Passwords do not match");
     return;
   }
   try {
-    const response = await axios.post('/register', {
+    const response = await axios.post("/register", {
       name: name.value,
       email: email.value,
       password: password.value,
-    }); 
-    console.log('Register successful', response.data);
-    localStorage.setItem('authToken', response.data.token); // Store token
-    router.push('/'); // Redirect to homepage
+    });
+    console.log("Register successful", response.data);
+    localStorage.setItem("authToken", response.data.token); // Store token
+    router.push("/"); // Redirect to homepage
   } catch (error) {
-    handleError('Register failed', error);
+    // handleError('Register failed', error);
+    console.error("Register failed", error);
   }
 };
 </script>
