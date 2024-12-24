@@ -1,11 +1,14 @@
 <?php
 
+
 namespace App\Http\Controllers;
+
 
 use App\Models\Product;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Exceptions\ProductNotFoundException;
 
 class ProductController extends Controller
 {
@@ -20,22 +23,33 @@ class ProductController extends Controller
             })
             ->paginate(30);
 
+
         Log::info('Products retrieved successfully', ['count' => $products->total()]);
+
 
         return ProductResource::collection($products);
     }
+
 
     /**
      * Get a single product by ID.
      */
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+
+
+        if (!$product) {
+            throw new ProductNotFoundException($id);
+        }
+
 
         Log::info('Product retrieved successfully', ['product_id' => $id]);
 
+
         return new ProductResource($product);
     }
+
 
     /**
      * Create a new product.
@@ -50,19 +64,29 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
+
         $product = Product::create($validated);
+
 
         Log::info('Product created successfully', ['product_id' => $product->id]);
 
+
         return new ProductResource($product);
     }
+
 
     /**
      * Update an existing product.
      */
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+
+
+        if (!$product) {
+            throw new ProductNotFoundException($id);
+        }
+
 
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
@@ -72,24 +96,43 @@ class ProductController extends Controller
             'price' => 'nullable|numeric',
         ]);
 
+
         $product->update($validated);
+
 
         Log::info('Product updated successfully', ['product_id' => $product->id]);
 
+
         return new ProductResource($product);
     }
+
 
     /**
      * Delete a product by ID.
      */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+
+
+        if (!$product) {
+            throw new ProductNotFoundException($id);
+        }
+
 
         $product->delete();
 
+
         Log::info('Product deleted successfully', ['product_id' => $id]);
+
 
         return response()->json(['message' => 'Product deleted successfully']);
     }
 }
+
+
+
+
+
+
+

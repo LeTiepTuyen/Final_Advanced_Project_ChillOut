@@ -47,27 +47,24 @@
 
             <div class="flex items-center my-4">
               <div class="text-xl font-bold text-gray-800">$ {{ priceComputed }}</div>
-              <span class="bg-gray-100 border border-gray-300 text-orange-500 text-sm font-semibold px-2 py-1 rounded-sm ml-3"
+              <span
+                class="bg-gray-100 border border-gray-300 text-orange-500 text-sm font-semibold px-2 py-1 rounded-sm ml-3"
                 >70% off</span
               >
             </div>
 
-
             <p class="text-green-600 text-sm font-semibold my-2">Free 11-day delivery over ￡8.28</p>
             <p class="text-green-600 text-sm font-semibold my-2">Free Shipping</p>
 
-
             <p style="color: rgb(255, 255, 255)">This text is white too.</p>
           </div>
-          
+
           <button
             @click="addToCart()"
             :disabled="isInCart"
-
             class="mt-6 w-full px-6 py-3 rounded-lg text-white text-lg font-semibold bg-red-500 transition-transform transform hover:scale-105 disabled:opacity-50"
-
           >
-            <div>{{ isInCart ? 'Is Added' : 'Add to Cart' }}</div>
+            <div>{{ isInCart ? "Is Added" : "Add to Cart" }}</div>
           </button>
         </div>
       </div>
@@ -79,9 +76,11 @@
 import MainLayout from "~/layouts/MainLayout.vue";
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
-const userStore = useUserStore();
+import { useRouter } from "vue-router";
 
+const userStore = useUserStore();
 const route = useRoute();
+const router = useRouter();
 
 let product = ref(null);
 let currentImage = ref(null);
@@ -90,9 +89,13 @@ const images = ref([]);
 onBeforeMount(async () => {
   try {
     const response = await axios.get(`/products/${route.params.id}`);
+
     product.value = response.data;
   } catch (error) {
-    handleError("Failed to fetch product:", error);
+    console.error("Failed to fetch product:", error);
+    if (error.response && error.response.status === 404) {
+      router.push("/404");
+    }
   }
 });
 
@@ -108,11 +111,9 @@ const isInCart = computed(() => {
   return userStore.cart.some((prod) => route.params.id == prod.id);
 });
 
-
 const priceComputed = computed(() => {
-  return product.value ? product.value.data.price / 100 : 0.00;
+  return product.value ? product.value.data.price / 100 : 0.0;
 });
-
 
 const addToCart = () => {
   userStore.cart.push(product.value);
