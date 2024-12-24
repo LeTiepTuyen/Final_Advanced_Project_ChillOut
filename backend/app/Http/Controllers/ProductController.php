@@ -23,9 +23,10 @@ class ProductController extends Controller
             })
             ->paginate(30);
 
+        // Log critical to test WebHook Slack:
+        // Log::critical('Products retrieved successfully', ['count' => $products->total()]);
 
         Log::info('Products retrieved successfully', ['count' => $products->total()]);
-
 
         return ProductResource::collection($products);
     }
