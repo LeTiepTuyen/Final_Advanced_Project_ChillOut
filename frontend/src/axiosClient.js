@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 // Lấy URL từ biến môi trường
 const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -37,8 +38,10 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // handleError('API Error:', error);
-    console.error("API Error:", error);
+    const router = useRouter();
+    if (error.response && error.response.status === 404) {
+      router.push("/404");
+    }
     return Promise.reject(error);
   }
 );

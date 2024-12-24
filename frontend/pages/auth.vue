@@ -86,7 +86,7 @@ const loginWithEmail = async () => {
     localStorage.setItem("authToken", response.data.token); // Store token
     router.push("/"); // Redirect to homepage
   } catch (error) {
-    // handleError("Login failed", error);
+    // handleError('Login failed', error);
     console.error("Login failed", error);
   }
 };
@@ -107,7 +107,7 @@ const registerWithEmail = async () => {
     localStorage.setItem("authToken", response.data.token); // Store token
     router.push("/"); // Redirect to homepage
   } catch (error) {
-    // handleError('Register failed', error);
+    // handleError("Register failed", error);
     console.error("Register failed", error);
   }
 };
