@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
+    use HasFactory;
+
     protected $table = 'order_items';
     protected $primaryKey = 'id';
     protected $keyType = 'integer';
@@ -19,8 +22,7 @@ class OrderItem extends Model
 
     public function order()
     {
-        return $this->belongsTo(Order::class, 'order_id', 'id')
-            ->onDelete('cascade');
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
     public function product()
