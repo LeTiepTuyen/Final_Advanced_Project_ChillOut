@@ -1,33 +1,14 @@
 <template>
   <div id="AuthPage" class="w-full h-[100vh] bg-white">
-    <div class="w-full flex items-center justify-center p-5 border-b border-b-gray-300">
-      <NuxtLink to="/" class="min-w-[170px]">
-        <img width="170" src="/logo.png" alt="Logo" />
-      </NuxtLink>
-    </div>
-
     <div class="max-w-[400px] mx-auto px-2">
-      <button
-        @click="login('google')"
-        class="flex items-center justify-center gap-3 p-1.5 w-full border hover:bg-gray-100 rounded-full text-lg font-semibold"
-      >
-        <img class="w-full max-w-[30px]" src="/google-logo.png" alt="Google Logo" />
-        <div>Google</div>
-      </button>
-
-      <button
-        @click="login('github')"
-        class="mt-4 flex items-center justify-center gap-3 p-1.5 w-full border hover:bg-gray-100 rounded-full text-lg font-semibold"
-      >
-        <img class="w-full max-w-[30px]" src="/github-logo.png" alt="GitHub Logo" />
-        <div>Github</div>
-      </button>
-
       <div class="text-center my-4">
         <button @click="showLogin = true" :class="{ 'font-bold': showLogin }">Login</button>
         <span class="mx-2">/</span>
         <button @click="showLogin = false" :class="{ 'font-bold': !showLogin }">Register</button>
       </div>
+
+      <!-- Hiển thị lỗi -->
+      <div v-if="errorMessage" class="text-red-500 text-sm">{{ errorMessage }}</div>
 
       <form v-if="showLogin" @submit.prevent="loginWithEmail">
         <div class="my-4">
@@ -36,7 +17,9 @@
         <div class="my-4">
           <input v-model="password" type="password" placeholder="Password" class="w-full p-2 border rounded" required />
         </div>
-        <button type="submit" class="w-full p-2 bg-blue-500 text-white rounded">Login</button>
+        <button :disabled="isLoading" type="submit" class="w-full p-2 bg-blue-500 text-white rounded">
+          {{ isLoading ? "Logging in..." : "Login" }}
+        </button>
       </form>
 
       <form v-else @submit.prevent="registerWithEmail">
@@ -58,7 +41,9 @@
             required
           />
         </div>
-        <button type="submit" class="w-full p-2 bg-green-500 text-white rounded">Register</button>
+        <button :disabled="isLoading" type="submit" class="w-full p-2 bg-green-500 text-white rounded">
+          {{ isLoading ? "Registering..." : "Register" }}
+        </button>
       </form>
     </div>
   </div>
@@ -74,41 +59,67 @@ const password = ref("");
 const name = ref("");
 const confirmPassword = ref("");
 const showLogin = ref(true);
+const errorMessage = ref("");
+const isLoading = ref(false);
 const router = useRouter();
 
-const loginWithEmail = async () => {
+// Lấy CSRF token và set vào header
+const getCsrfToken = async () => {
   try {
+    await axios.get("/sanctum/csrf-cookie");
+    const xsrfToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("XSRF-TOKEN"))
+      ?.split("=")[1];
+
+    if (xsrfToken) {
+      axios.defaults.headers.common["X-XSRF-TOKEN"] = decodeURIComponent(xsrfToken);
+    }
+  } catch (error) {
+    console.error("Failed to set CSRF token:", error);
+    throw error;
+  }
+};
+
+const loginWithEmail = async () => {
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    await getCsrfToken(); // Lấy CSRF token trước khi gửi request
     const response = await axios.post("/login", {
       email: email.value,
       password: password.value,
     });
-    console.log("Login successful", response.data);
-    localStorage.setItem("authToken", response.data.token); // Store token
-    router.push("/"); // Redirect to homepage
+    localStorage.setItem("authToken", response.data.token);
+    router.push("/");
   } catch (error) {
-    // handleError('Login failed', error);
-    console.error("Login failed", error);
+    errorMessage.value = error.response?.data?.message || "Login failed";
+  } finally {
+    isLoading.value = false;
   }
 };
 
 const registerWithEmail = async () => {
   if (password.value !== confirmPassword.value) {
-    // handleError("Passwords do not match");
-    console.error("Passwords do not match");
+    errorMessage.value = "Passwords do not match";
     return;
   }
+  isLoading.value = true;
+  errorMessage.value = "";
   try {
+    await getCsrfToken(); // Lấy CSRF token trước khi gửi request
     const response = await axios.post("/register", {
       name: name.value,
       email: email.value,
       password: password.value,
     });
-    console.log("Register successful", response.data);
-    localStorage.setItem("authToken", response.data.token); // Store token
-    router.push("/"); // Redirect to homepage
+    console.log("Registration successful:", response.data);
+    localStorage.setItem("authToken", response.data.token);
+    router.push("/");
   } catch (error) {
-    // handleError("Register failed", error);
-    console.error("Register failed", error);
+    errorMessage.value = error.response?.data?.message || "Register failed";
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
