@@ -38,6 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+Route::get('/debug-exception', function () {
+    throw new Exception('This is a test exception for Pulse.');
+});
+
 // Demo error handling
 Route::get('/admin', function () {
     ErrorHandler::logAndAbortForbidden(

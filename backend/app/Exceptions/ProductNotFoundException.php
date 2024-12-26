@@ -20,13 +20,19 @@ class ProductNotFoundException extends Exception
     {
         return $this->productId;
     }
+
     /**
      * Báo cáo lỗi (report).
      */
     public function report(): void
     {
-        // Log lỗi hoặc gửi tới các dịch vụ giám sát như Sentry, Flare
-        // logger()->error('Custom exception occurred', ['message' => $this->getMessage()]);
+        // Ghi log lỗi
+        logger()->warning('Product not found', ['product_id' => $this->getProductId()]);
+
+        // Ghi nhận lỗi vào Pulse (nếu Pulse được cấu hình)
+        if (app()->bound('pulse')) {
+            app('pulse')->recordException($this);
+        }
     }
 
     /**

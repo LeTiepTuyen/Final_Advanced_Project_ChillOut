@@ -89,12 +89,16 @@ const images = ref([]);
 onBeforeMount(async () => {
   try {
     const response = await axios.get(`/products/${route.params.id}`);
-
-    product.value = response.data;
+    console.log("Response data:", response.data); // Debugging line
+    if (response.data.error && response.data.error.status === 404) {
+      navigateTo("/404");
+    } else {
+      product.value = response.data;
+    }
   } catch (error) {
     console.error("Failed to fetch product:", error);
     if (error.response && error.response.status === 404) {
-      router.push("/404");
+      navigateTo("/404");
     }
   }
 });

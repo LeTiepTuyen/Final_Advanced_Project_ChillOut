@@ -56,6 +56,8 @@ class VerifyCsrfToken extends Middleware
                 'error' => $e->getMessage(),
             ]);
 
+
+
             // Rethrow the exception
             throw $e;
         }
