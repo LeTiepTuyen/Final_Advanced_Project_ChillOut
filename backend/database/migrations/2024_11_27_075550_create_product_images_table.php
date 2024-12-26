@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->string('url');
             $table->timestamps(); // created_at và updated_at
-    
+
             // Relationship
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });

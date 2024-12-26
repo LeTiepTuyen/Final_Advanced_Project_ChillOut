@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('short_description')->default('');
             $table->string('url');
-            $table->integer('price');
+            $table->decimal('price');
             $table->timestamps(); // created_at và updated_at
         });
     }
