@@ -65,11 +65,11 @@ axiosClient.interceptors.response.use(
       if (error.response.status === 401) {
         console.warn("Unauthorized. Removing token and redirecting to auth page...");
         localStorage.removeItem("authToken");
-        router.push("/auth");
+        navigateTo("/auth");
       }
 
       if (error.response.status === 404) {
-        router.push("/404");
+        navigateTo("/404");
       }
     }
     return Promise.reject(error);
