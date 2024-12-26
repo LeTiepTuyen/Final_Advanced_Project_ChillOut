@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        Integration::handles($exceptions);
+
 
         $exceptions->report(function (ProductNotFoundException $e) {
             $e->report(); // Gọi phương thức report() từ ProductNotFoundException
@@ -35,6 +37,6 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        Integration::handles($exceptions);
+
 
     })->create();

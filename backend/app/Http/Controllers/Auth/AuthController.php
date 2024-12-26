@@ -29,12 +29,14 @@ class AuthController extends Controller
             return response()->json(['message' => 'User registration failed.'], 500);
         }
 
+        // Tạo token với UUID
         $token = $user->createToken('Auth Token')->plainTextToken;
 
         return response()->json([
             'message' => 'Registration successful.',
             'token_type' => 'Bearer',
             'token' => $token,
+            'user_id' => $user->id, // Để đảm bảo UUID của user được trả về
         ], 201);
     }
 
@@ -51,12 +53,14 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials.'], 401);
         }
 
+        // Tạo token với UUID
         $token = $user->createToken('Auth Token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful.',
             'token_type' => 'Bearer',
             'token' => $token,
+            'user_id' => $user->id, // Để đảm bảo UUID của user được trả về
         ], 200);
     }
 
@@ -77,4 +81,3 @@ class AuthController extends Controller
         ], 200);
     }
 }
-
