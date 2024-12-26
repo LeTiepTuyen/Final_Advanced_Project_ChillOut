@@ -17,7 +17,8 @@ class VerifyCsrfToken extends Middleware
         'api/login', // Exclude login route from CSRF verification
         'api/sanctum/csrf-cookie',
         '/register',
-        '/login', // Exclude sanctum CSRF cookie route
+        '/login',
+        '/pulse', // Exclude sanctum CSRF cookie route
     ];
 
     /**
