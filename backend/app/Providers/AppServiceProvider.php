@@ -26,9 +26,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
         Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
-            // Thêm security scheme Bearer Token vào tài liệu API
             $openApi->secure(
-                SecurityScheme::http('bearer') // Sử dụng Authorization header với Bearer token
+                SecurityScheme::http('bearer')
             );
         });
     }

@@ -34,7 +34,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // API resources
     Route::apiResource('addresses', AddressController::class);
     Route::apiResource('orders', OrderController::class);
-    Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+    Route::apiResource('products', ProductController::class);
+    // Route::apiResource('products', ProductController::class)->except(['index', 'show']);
 });
 
 
