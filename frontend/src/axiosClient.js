@@ -10,37 +10,67 @@ const axiosClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Add this line to include credentials in requests
+  withCredentials: true, // Bao gồm cookie trong request nếu cần
 });
 
-// Xử lý request nếu cần
+// Hàm để lấy CSRF token trước khi thực hiện các POST/PUT/DELETE request
+const getCsrfToken = async () => {
+  try {
+    await axiosClient.get("/sanctum/csrf-cookie");
+    console.log("CSRF cookie set successfully.");
+  } catch (error) {
+    console.error("Failed to set CSRF cookie:", error);
+    throw error;
+  }
+};
+
+// Xử lý request trước khi gửi
 axiosClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    // Đảm bảo CSRF cookie được thiết lập
+    if (["post", "put", "delete"].includes(config.method)) {
+      await getCsrfToken();
+    }
+
+    // Lấy CSRF token từ meta tag (logic cũ)
     const tokenElement = document.querySelector('meta[name="csrf-token"]');
     if (tokenElement) {
       const token = tokenElement.getAttribute("content");
       if (token) {
-        config.headers["X-CSRF-TOKEN"] = token;
+        config.headers["X-CSRF-TOKEN"] = token; // Thêm X-CSRF-TOKEN từ meta tag nếu có
       }
     }
+
+    // Lấy Authorization token từ localStorage
     const authToken = localStorage.getItem("authToken");
     if (authToken) {
-      config.headers["Authorization"] = `Bearer ${authToken}`;
+      config.headers["Authorization"] = `Bearer ${authToken}`; // Thêm Authorization header với Bearer token
     }
+
+    console.log("Sending request to:", config.url); // Ghi log URL request
     return config;
   },
   (error) => {
+    console.error("Request error:", error); // Ghi log lỗi request
     return Promise.reject(error);
   }
 );
 
-// Xử lý response nếu cần
+// Xử lý response trả về từ server
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => response, // Trả về response nếu không có lỗi
   (error) => {
     const router = useRouter();
-    if (error.response && error.response.status === 404) {
-      router.push("/404");
+    if (error.response) {
+      if (error.response.status === 401) {
+        console.warn("Unauthorized. Removing token and redirecting to auth page...");
+        localStorage.removeItem("authToken");
+        router.push("/auth");
+      }
+
+      if (error.response.status === 404) {
+        router.push("/404");
+      }
     }
     return Promise.reject(error);
   }

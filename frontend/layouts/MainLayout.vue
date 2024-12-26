@@ -134,14 +134,19 @@ const user = ref(null);
 const router = useRouter();
 
 onMounted(async () => {
+  const authToken = localStorage.getItem("authToken");
+  if (!authToken) {
+    console.warn("No token found. Redirecting to auth page...");
+    return; // Không gửi request nếu không có token
+  }
+
   try {
     const response = await axios.get("/profile");
     user.value = response.data.data;
   } catch (error) {
-    console.error("Failed to fetch user profile", error);
-    if (error.response && error.response.status === 404) {
-      router.push("/404");
-    }
+    console.error("Failed to fetch user profile. Logging out...");
+    localStorage.removeItem("authToken");
+    router.push("/auth");
   }
 });
 

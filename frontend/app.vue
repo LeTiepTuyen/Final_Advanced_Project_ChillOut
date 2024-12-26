@@ -63,14 +63,22 @@ const isPageLoadedSuccess = () => {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 onMounted(async () => {
-  window.addEventListener("resize", () => {
-    windowWidth.value = window.innerWidth;
-  });
+  const authToken = localStorage.getItem("authToken");
+  if (!authToken) {
+    userStore.isLoading = false; // Không hiển thị loading nếu không có token
+    return;
+  }
 
-  userStore.isLoading = true;
-  await delay(500); // Ensuring the isLoading state is updated
-  await isPageLoadedSuccess();
-  userStore.isLoading = false;
+  try {
+    userStore.isLoading = true;
+    const response = await axios.get("/profile");
+    userStore.user = response.data.data; // Lưu thông tin user nếu hợp lệ
+  } catch (error) {
+    console.warn("Invalid token. Clearing user session...");
+    localStorage.removeItem("authToken");
+  } finally {
+    userStore.isLoading = false;
+  }
 });
 
 watch(
