@@ -40,7 +40,6 @@ class ProductNotFoundException extends Exception
      */
     public function render(Request $request): JsonResponse
     {
-        // Trả về phản hồi JSON cho API
         return response()->json([
             'error' => [
                 'status' => 404,

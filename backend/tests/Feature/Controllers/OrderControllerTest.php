@@ -11,6 +11,12 @@ class OrderControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware();
+    }
+
     /**
      * Test index method to retrieve a list of orders.
      */
