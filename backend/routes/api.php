@@ -6,22 +6,33 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Services\ErrorHandler;
+use App\Http\Middleware\RestrictExternalRequests;
 
-// Public User authentication routes
+
+// Public routes
+Route::get('/products', [ProductController::class, 'index'])->middleware(RestrictExternalRequests::class);
+Route::get('/products/{product}', [ProductController::class, 'show'])->middleware(RestrictExternalRequests::class);
+
+
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie set successfully']);
+});
+
+// Auth routes
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    // User routes
     Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('auth.profile');
 
     // API resources
-    Route::apiResource('products', ProductController::class);
     Route::apiResource('addresses', AddressController::class);
     Route::apiResource('orders', OrderController::class);
+    Route::apiResource('products', ProductController::class)->except(['index', 'show']);
 });
+
 
 // Demo error handling
 Route::get('/admin', function () {
