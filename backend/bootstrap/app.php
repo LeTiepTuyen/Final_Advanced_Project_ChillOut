@@ -7,7 +7,7 @@
     use Laravel\Sanctum\Http\Middleware\CheckAbilities;
     use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
     use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
-
+    use Sentry\Laravel\Integration;
 
     return Application::configure(basePath: dirname(__DIR__))
         ->withRouting(
@@ -25,6 +25,9 @@
             //
         })
         ->withExceptions(function (Exceptions $exceptions) {
+
+            Integration::handles($exceptions);
+
             $exceptions->report(function (App\Exceptions\ProductNotFoundException $e) {
                 logger()->warning('Product not found', ['product_id' => $e->getProductId()]);
             });

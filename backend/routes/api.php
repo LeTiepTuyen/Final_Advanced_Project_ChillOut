@@ -18,6 +18,10 @@ Route::get('/sanctum/csrf-cookie', function () {
     return response()->json(['message' => 'CSRF cookie set successfully']);
 });
 
+// Route::get('/debug-sentry', function () {
+//     throw new Exception('My first Sentry error!');
+// });
+
 // Auth routes
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
