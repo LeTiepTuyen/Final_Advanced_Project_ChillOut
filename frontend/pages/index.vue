@@ -12,25 +12,33 @@
 
 <script setup>
 import MainLayout from "~/layouts/MainLayout.vue";
-import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
-import { useRouter } from "vue-router";
+import { ref, onBeforeMount, watch } from "vue";
+import { useRoute } from "vue-router";
 
-const userStore = useUserStore();
-const router = useRouter();
+
+const route = useRoute();
 
 let products = ref(null);
 
-onBeforeMount(async () => {
+const fetchProducts = async (query = "") => {
   try {
-    const response = await axios.get("/products");
+    const response = await axios.get("/products", { params: { query } });
+    console.log(response.data); // Thêm dòng này để kiểm tra dữ liệu
     products.value = response.data;
-    userStore.isLoading = false;
   } catch (error) {
     console.error("Failed to fetch products", error);
-    if (error.response && error.response.status === 404) {
-      router.push("/404");
-    }
   }
+};
+
+onBeforeMount(() => {
+  fetchProducts(route.query.search || "");
 });
+
+watch(
+  () => route.query.search,
+  (newQuery) => {
+    fetchProducts(newQuery || "");
+  }
+);
 </script>

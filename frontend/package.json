@@ -21,6 +21,7 @@
     "@pinia/nuxt": "^0.5.5",
     "@stripe/stripe-js": "^3.5.0",
     "axios": "^1.7.8",
+    "lodash": "^4.17.21",
     "nuxt": "^3.11.2",
     "nuxt-icon": "^0.6.10",
     "nuxt-lodash": "^2.5.3",

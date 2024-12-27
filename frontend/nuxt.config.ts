@@ -27,5 +27,5 @@ export default defineNuxtConfig({
       script: [{ src: "https://js.stripe.com/v3/", defer: true }],
     },
   },
-  devtools: { enabled: true },
+  devtools: { enabled: false },
 });
