@@ -86,7 +86,7 @@ const loginWithEmail = async () => {
   errorMessage.value = "";
   try {
     await getCsrfToken(); // Lấy CSRF token trước khi gửi request
-    const response = await axios.post("/login", {
+    const response = await axios.post("/auth/login", {
       email: email.value,
       password: password.value,
     });
@@ -108,7 +108,7 @@ const registerWithEmail = async () => {
   errorMessage.value = "";
   try {
     await getCsrfToken(); // Lấy CSRF token trước khi gửi request
-    const response = await axios.post("/register", {
+    const response = await axios.post("/auth/register", {
       name: name.value,
       email: email.value,
       password: password.value,
