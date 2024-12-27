@@ -23,13 +23,20 @@ Route::get('/sanctum/csrf-cookie', function () {
 // });
 
 // Auth routes
-Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+
+Route::prefix('auth')->group(function () {
+    Route::post('register', [AuthController::class, 'register'])->name('auth.register');
+    Route::post('login', [AuthController::class, 'login'])->name('auth.login');
+    Route::get('profile', [AuthController::class, 'profile'])->name('auth.profile')->middleware('auth:sanctum');
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->name('auth.logout');
+});
+
+
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-    Route::get('/profile', [AuthController::class, 'profile'])->name('auth.profile');
+    // Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    // Route::get('/profile', [AuthController::class, 'profile'])->name('auth.profile');
 
     // API resources
     Route::apiResource('addresses', AddressController::class);
