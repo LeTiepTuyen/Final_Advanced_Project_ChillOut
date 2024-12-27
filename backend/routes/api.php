@@ -25,17 +25,10 @@ Route::apiResource('products', ProductController::class)
 //     throw new Exception('My first Sentry error!');
 // });
 
-// Auth routes
-Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-});
-
-
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-    Route::get('/profile', [AuthController::class, 'profile'])->name('auth.profile');
+    // Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    // Route::get('/profile', [AuthController::class, 'profile'])->name('auth.profile');
 
     // API resources
     Route::apiResource('addresses', AddressController::class);
