@@ -14,23 +14,21 @@ class ProductController extends Controller
 {
     /**
      * Get all products with optional search functionality.
-    */
+     */
     public function index(Request $request)
     {
-        $products = Product::query()
-            ->when($request->search, function ($query, $search) {
-                $query->where('title', 'like', "%$search%");
-            })
-            ->paginate(30);
+        $query = $request->get('query', '');
 
-        // Log critical to test WebHook Slack:
-        // Log::critical('Products retrieved successfully', ['count' => $products->total()]);
-
-        Log::info('Products retrieved successfully', ['count' => $products->total()]);
+        if ($query) {
+            // Search using Laravel Scout and Meilisearch
+            $products = Product::search($query)->paginate(30);
+        } else {
+            // Return all products when no search query is provided
+            $products = Product::query()->paginate(30);
+        }
 
         return ProductResource::collection($products);
     }
-
 
     /**
      * Get a single product by ID.
@@ -39,18 +37,14 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-
         if (!$product) {
             throw new ProductNotFoundException($id);
         }
 
-
         Log::info('Product retrieved successfully', ['product_id' => $id]);
-
 
         return new ProductResource($product);
     }
-
 
     /**
      * Create a new product.
@@ -65,16 +59,12 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
-
         $product = Product::create($validated);
-
 
         Log::info('Product created successfully', ['product_id' => $product->id]);
 
-
         return new ProductResource($product);
     }
-
 
     /**
      * Update an existing product.
@@ -83,11 +73,9 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-
         if (!$product) {
             throw new ProductNotFoundException($id);
         }
-
 
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
@@ -97,16 +85,12 @@ class ProductController extends Controller
             'price' => 'nullable|numeric',
         ]);
 
-
         $product->update($validated);
-
 
         Log::info('Product updated successfully', ['product_id' => $product->id]);
 
-
         return new ProductResource($product);
     }
-
 
     /**
      * Delete a product by ID.
@@ -115,17 +99,13 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-
         if (!$product) {
             throw new ProductNotFoundException($id);
         }
 
-
         $product->delete();
 
-
         Log::info('Product deleted successfully', ['product_id' => $id]);
-
 
         return response()->json(['message' => 'Product deleted successfully']);
     }
