@@ -24,7 +24,6 @@ let products = ref(null);
 const fetchProducts = async (query = "") => {
   try {
     const response = await axios.get("/products", { params: { query } });
-    console.log(response.data); // Thêm dòng này để kiểm tra dữ liệu
     products.value = response.data;
   } catch (error) {
     console.error("Failed to fetch products", error);
