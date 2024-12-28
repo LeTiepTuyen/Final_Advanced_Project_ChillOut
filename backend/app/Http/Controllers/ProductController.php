@@ -20,10 +20,8 @@ class ProductController extends Controller
         $query = $request->get('query', '');
 
         if ($query) {
-            // Search using Laravel Scout and Meilisearch
             $products = Product::search($query)->paginate(30);
         } else {
-            // Return all products when no search query is provided
             $products = Product::query()->paginate(30);
         }
 
