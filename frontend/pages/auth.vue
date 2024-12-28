@@ -19,6 +19,7 @@
         </div>
         <button :disabled="isLoading" type="submit" class="w-full p-2 bg-blue-500 text-white rounded">
           {{ isLoading ? "Logging in..." : "Login" }}
+          
         </button>
       </form>
 
@@ -46,6 +47,7 @@
         </button>
       </form>
     </div>
+    <Loading v-if="isLoading"/>
   </div>
 </template>
 
