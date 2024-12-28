@@ -55,7 +55,7 @@ This project contains the backend (Laravel with PostgreSQL) and frontend (Nuxt 3
    ```bash
    php artisan scout:import 'App\Models\Product'
 
-7. **Start the Laravel server:**
+8. **Start the Laravel server:**
 
    ```bash
    php artisan serve

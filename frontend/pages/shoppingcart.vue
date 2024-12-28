@@ -207,14 +207,7 @@ const decreaseQuantity = (product) => {
             alt="Empty Cart"
           />
           <div class="text-xl mt-4">No items yet?</div>
-          <div v-if="!user" class="flex justify-center mt-4">
-            <NuxtLink
-              to="/auth"
-              class="bg-red-500 w-full text-white text-xl font-semibold py-2 rounded-full hover:bg-red-600 transition duration-300"
-            >
-              Sign in
-            </NuxtLink>
-          </div>
+
         </div>
       </div>
       <div v-else class="md:flex gap-4 justify-between mx-auto w-full">

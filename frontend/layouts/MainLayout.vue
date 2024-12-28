@@ -48,7 +48,8 @@
               <div class="border-b" />
               <ul class="bg-white">
                 <li @click="navigateTo('/orders')" class="text-[13px] py-2 px-4 w-full hover:bg-gray-200">My Orders</li>
-                <li v-if="user" @click="logout" class="text-[13px] py-2 px-4 w-full hover:bg-gray-200">Sign out</li>
+                <li v-if="user" @click="logout" class="text-[13px] py-2 px-4 w-full hover:bg-gray-200"><Loading v-if="isLoading"/> Sign out</li>
+                
               </ul>
             </div>
           </li>
@@ -119,7 +120,7 @@
       </div>
     </header>
 
-    <Loading v-if="userStore.isLoading" />
+    
     <main class="lg:pt-[150px] md:pt-[130px] pt-[80px]">
       <slot />
     </main>
@@ -130,13 +131,15 @@
 <script setup>
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import debounce from 'lodash/debounce';
 
 const userStore = useUserStore();
 const user = ref(null);
 const router = useRouter();
+
+let isLoading = ref(false);
 
 onMounted(async () => {
   const token = localStorage.getItem("authToken");
@@ -154,6 +157,7 @@ onMounted(async () => {
 });
 
 const logout = async () => {
+  isLoading.value = true;
   try {
     await axios.post("/logout");
     user.value = null;
@@ -195,7 +199,7 @@ const fetchSuggestions = debounce(async (newQuery) => {
   } else {
     searchSuggestions.value = [];
   }
-}, 300); // 300ms delay
+}, 300); 
 
 watch(
   () => searchQuery.value,
