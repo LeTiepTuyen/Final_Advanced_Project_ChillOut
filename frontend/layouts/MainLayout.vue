@@ -66,10 +66,11 @@
             <div class="relative">
               <div class="flex items-center border-2 border-[#FF4646] rounded-md w-full">
                 <input
-                  class="w-full placeholder-gray-400 text-sm pl-3 focus:outline-none"
-                  placeholder="kitchen accessories"
+                  v-model="searchQuery"
+                  @keyup.enter="handleSearch"
                   type="text"
-                  v-model="searchItem"
+                  placeholder="Search for products..."
+                  class="w-full placeholder-gray-400 text-sm pl-3 focus:outline-none"
                   aria-label="Search"
                 />
                 <Icon v-if="isSearching" name="eos-icons:loading" size="25" class="mr-2" />
@@ -77,19 +78,22 @@
                   <Icon name="ph:magnifying-glass" size="20" color="#ffffff" />
                 </button>
               </div>
-              <div class="absolute bg-white max-w-[700px] h-auto w-full">
-                <div v-if="items && items.data" v-for="item in items.data" class="p-1">
-                  <NuxtLink
-                    :to="`/item/${item.id}`"
-                    class="flex items-center justify-between w-full cursor-pointer hover:bg-gray-100"
-                  >
+              <div v-if="searchQuery.trim() && searchSuggestions.length" class="absolute bg-white max-w-[700px] h-auto w-full border border-gray-200 rounded-md shadow-lg mt-1">
+                <ul>
+                  <li v-for="suggestion in searchSuggestions" :key="suggestion.id" class="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100">
                     <div class="flex items-center">
-                      <img class="rounded-md" width="40" :src="item.url" alt="Sample Image" />
-                      <div class="truncate ml-2">{{ item.title }}</div>
+                      <img class="rounded-md" width="40" :src="suggestion.image" alt="Product Image" />
+                      <div class="truncate ml-2">
+                        <div class="font-semibold">{{ suggestion.title }}</div>
+                        <div class="text-sm text-gray-600">{{ suggestion.short_description }}</div>
+                      </div>
                     </div>
-                    <div class="truncate">${{ item.price / 100 }}</div>
-                  </NuxtLink>
-                </div>
+                    <div class="truncate">${{ (suggestion.price / 100).toFixed(2) }}</div>
+                  </li>
+                </ul>
+              </div>
+              <div v-else-if="showNoResults" class="absolute bg-white max-w-[700px] h-auto w-full border border-gray-200 rounded-md shadow-lg mt-1">
+                <div class="p-2 text-sm font-italic text-black-500 text-center font-bold">No product found</div>
               </div>
             </div>
           </div>
@@ -129,6 +133,8 @@ import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { debounce } from "lodash";
+import { watch } from "vue";
 
 const userStore = useUserStore();
 const user = ref(null);
@@ -139,7 +145,6 @@ let isLoading = ref(false);
 onMounted(async () => {
   const authToken = localStorage.getItem("authToken");
   if (!authToken) {
-    console.warn("No token found. Redirecting to auth page...");
     return; // Không gửi request nếu không có token
   }
 
@@ -168,55 +173,71 @@ const logout = async () => {
 let isAccountMenu = ref(false);
 let isCartHover = ref(false);
 let isSearching = ref(false);
-let searchItem = ref("");
-let items = ref(null);
 
-const searchByName = useDebounce(async () => {
-  if (!searchItem.value.trim()) {
-    items.value = []; // Đặt items thành mảng trống nếu không có tìm kiếm
-    return;
+const searchQuery = ref("");
+let searchSuggestions = ref([]);
+let noResultsTimeout = null;
+let showNoResults = ref(false);
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ path: "/", query: { search: searchQuery.value } });
   }
-  isSearching.value = true;
-  const searchItemValue = capitalizeWords(searchItem.value);
-  try {
-    const response = await axios.get(`/products`, {
-      params: {
-        search: searchItemValue,
-      },
-    });
-    items.value = response.data;
-  } catch (error) {
-    // handleError("Failed to search products:", error);
-    console.error("Failed to search products:", error);
-  } finally {
-    isSearching.value = false;
+};
+
+
+const fetchSuggestions = debounce(async (newQuery) => {
+  if (newQuery.trim()) {
+    isSearching.value = true;
+    try {
+      const response = await axios.get("/products", { params: { query: newQuery } });
+      searchSuggestions.value = response.data.data.map(product => ({
+        id: product.id,
+        image: product.images[0]?.url || '/default-image.png',
+        title: product.title,
+        short_description: product.short_description,
+        price: product.price
+      }));
+    } finally {
+      isSearching.value = false;
+    }
+  } else {
+    searchSuggestions.value = [];
   }
-}, 100);
+}, 300); 
 
 watch(
-  () => searchItem.value,
-  async () => {
-    // Nếu không có giá trị trong ô tìm kiếm, reset danh sách sản phẩm
-    if (!searchItem.value.trim()) {
-      setTimeout(() => {
-        items.value = []; // Reset items thành mảng trống
-        isSearching.value = false;
-      }, 500);
-      return;
-    }
-    searchByName(); // Gọi hàm tìm kiếm nếu có giá trị
+  () => searchQuery.value,
+  (newQuery) => {
+    fetchSuggestions(newQuery);
+    showNoResults.value = false;
+    clearTimeout(noResultsTimeout);
   }
 );
+
+watch(
+  () => searchSuggestions.value,
+  (newSuggestions) => {
+    clearTimeout(noResultsTimeout);
+    if (!searchQuery.value.trim()) {
+      showNoResults.value = false;
+      return;
+    }
+    if (newSuggestions.length === 0) {
+      noResultsTimeout = setTimeout(() => {
+        showNoResults.value = true;
+      }, 100);
+    } else {
+      showNoResults.value = false; 
+    }
+  }
+);
+
+const navigateToProduct = (id) => {
+  router.push(`/item/${id}`);
+};
 
 const navigateToOrders = () => {
   router.push("/orders");
 };
-
-function capitalizeWords(sentence) {
-  if (!sentence) return "";
-  return sentence
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
 </script>

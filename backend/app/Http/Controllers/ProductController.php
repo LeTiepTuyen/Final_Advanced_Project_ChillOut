@@ -17,16 +17,13 @@ class ProductController extends Controller
     */
     public function index(Request $request)
     {
-        $products = Product::query()
-            ->when($request->search, function ($query, $search) {
-                $query->where('title', 'like', "%$search%");
-            })
-            ->paginate(30);
+        $query = $request->get('query', '');
 
-        // Log critical to test WebHook Slack:
-        // Log::critical('Products retrieved successfully', ['count' => $products->total()]);
-
-        Log::info('Products retrieved successfully', ['count' => $products->total()]);
+        if ($query) {
+            $products = Product::search($query)->paginate(30);
+        } else {
+            $products = Product::query()->paginate(30);
+        }
 
         return ProductResource::collection($products);
     }

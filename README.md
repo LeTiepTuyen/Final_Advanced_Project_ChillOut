@@ -45,7 +45,18 @@ This project contains the backend (Laravel with PostgreSQL) and frontend (Nuxt 3
    ```bash
    php artisan migrate --seed
 
-6. **Start the Laravel server:**
+6. **Start the Meilisearch by docker:**
+   If you don'd have docker, please download on this [link](https://docker.com) and open it.
+
+   ```bash
+   docker-compose up -d
+
+7. **Import data to Meilisearch:**
+
+   ```bash
+   php artisan scout:import 'App\Models\Product'
+
+8. **Start the Laravel server:**
 
    ```bash
    php artisan serve
