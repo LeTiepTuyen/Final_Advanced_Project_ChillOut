@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+
 
 class Product extends Model
 {
     use HasFactory;
+    use Searchable;
     protected $table = 'products';
     protected $primaryKey = 'id';
     protected $keyType = 'integer';
@@ -30,5 +33,19 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'product_id', 'id');
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'title' => $this->title,
+            'description' => $this->description,
+            'short_description' => $this->short_description,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'products';
     }
 }

@@ -19,34 +19,45 @@
 
 <script setup>
 import MainLayout from "~/layouts/MainLayout.vue";
-import PreloadLayout from "~/components/PreloadLayout.vue"; // Import component preload layout
+import PreloadLayout from "~/components/PreloadLayout.vue";
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
 import { useRouter } from "vue-router";
-
+import { ref, onBeforeMount, watch } from "vue";
 
 const userStore = useUserStore();
 const router = useRouter();
-
+const route = useRoute();
 
 let products = ref(null);
-let isLoading = ref(true); // Thêm biến isLoading để kiểm tra trạng thái tải
+let isLoading = ref(true); 
 
 
-onBeforeMount(async () => {
+const fetchProducts = async (query = "") => {
   try {
-    const response = await axios.get("/products");
+    const response = await axios.get("/products", { params: { query } });
     products.value = response.data;
     userStore.isLoading = false;
-    isLoading.value = false; // Đặt isLoading thành false khi API đã tải xong
+    isLoading.value = false;
   } catch (error) {
     console.error("Failed to fetch products", error);
     if (error.response && error.response.status === 404) {
       router.push("/404");
     }
-    isLoading.value = false; // Dù có lỗi hay không, cũng đặt isLoading thành false
+    isLoading.value = false;
   }
+};
+
+onBeforeMount(() => {
+  fetchProducts(route.query.search || "");
 });
+
+watch(
+  () => route.query.search,
+  (newQuery) => {
+    fetchProducts(newQuery || "");
+  }
+);
 </script>
 
 
