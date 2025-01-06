@@ -80,7 +80,7 @@
               </div>
               <div v-if="searchQuery.trim() && searchSuggestions.length" class="absolute bg-white max-w-[700px] h-auto w-full border border-gray-200 rounded-md shadow-lg mt-1">
                 <ul>
-                  <li v-for="suggestion in searchSuggestions" :key="suggestion.id" class="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100">
+                  <li v-for="suggestion in searchSuggestions" :key="suggestion.id" class="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100" @click="navigateToProduct(suggestion.id)">
                     <div class="flex items-center">
                       <img class="rounded-md" width="40" :src="suggestion.image" alt="Product Image" />
                       <div class="truncate ml-2">
@@ -92,7 +92,7 @@
                   </li>
                 </ul>
               </div>
-              <div v-else-if="showNoResults" class="absolute bg-white max-w-[700px] h-auto w-full border border-gray-200 rounded-md shadow-lg mt-1">
+              <div v-else-if="showNoResults && searchQuery.trim()" class="absolute bg-white max-w-[700px] h-auto w-full border border-gray-200 rounded-md shadow-lg mt-1">
                 <div class="p-2 text-sm font-italic text-black-500 text-center font-bold">No product found</div>
               </div>
             </div>
@@ -182,6 +182,8 @@ let showNoResults = ref(false);
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
     router.push({ path: "/", query: { search: searchQuery.value } });
+    searchSuggestions.value = []; // Xóa ngay lập tức
+    showNoResults.value = false;
   }
 };
 
@@ -198,11 +200,13 @@ const fetchSuggestions = debounce(async (newQuery) => {
         short_description: product.short_description,
         price: product.price
       }));
+      showNoResults.value = response.data.data.length === 0;
     } finally {
       isSearching.value = false;
     }
   } else {
     searchSuggestions.value = [];
+    showNoResults.value = false;
   }
 }, 300); 
 
@@ -218,20 +222,14 @@ watch(
 watch(
   () => searchSuggestions.value,
   (newSuggestions) => {
-    clearTimeout(noResultsTimeout);
     if (!searchQuery.value.trim()) {
       showNoResults.value = false;
       return;
     }
-    if (newSuggestions.length === 0) {
-      noResultsTimeout = setTimeout(() => {
-        showNoResults.value = true;
-      }, 100);
-    } else {
-      showNoResults.value = false; 
-    }
+    showNoResults.value = newSuggestions.length === 0;
   }
 );
+
 
 const navigateToProduct = (id) => {
   router.push(`/item/${id}`);

@@ -10,20 +10,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\ProductNotFoundException;
 
+
 class ProductController extends Controller
 {
     /**
      * Get all products with optional search functionality.
-    */
+     */
     public function index(Request $request)
     {
         $query = $request->get('query', '');
 
+
         if ($query) {
-            $products = Product::search($query)->paginate(30);
+            // Use Laravel Scout for full-text search
+            $products = Product::search($query)->paginate(50); // Adjust pagination size as needed
         } else {
-            $products = Product::query()->paginate(30);
+            // Fallback to regular pagination if no search query
+            $products = Product::query()->paginate(50);
         }
+
 
         return ProductResource::collection($products);
     }
@@ -127,10 +132,6 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product deleted successfully']);
     }
 }
-
-
-
-
 
 
 
