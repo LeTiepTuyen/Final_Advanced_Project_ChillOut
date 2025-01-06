@@ -1,6 +1,8 @@
 <?php
 
+
 return [
+
 
     /*
     |--------------------------------------------------------------------------
@@ -13,10 +15,11 @@ return [
     |
     */
 
+
     'default' => env('QUEUE_CONNECTION', 'database'),
 
-    /*
-    |--------------------------------------------------------------------------
+
+    /*\
     | Queue Connections
     |--------------------------------------------------------------------------
     |
@@ -28,11 +31,14 @@ return [
     |
     */
 
+
     'connections' => [
+
 
         'sync' => [
             'driver' => 'sync',
         ],
+
 
         'database' => [
             'driver' => 'database',
@@ -43,6 +49,7 @@ return [
             'after_commit' => false,
         ],
 
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),
@@ -51,6 +58,7 @@ return [
             'block_for' => 0,
             'after_commit' => false,
         ],
+
 
         'sqs' => [
             'driver' => 'sqs',
@@ -63,6 +71,7 @@ return [
             'after_commit' => false,
         ],
 
+
         'redis' => [
             'driver' => 'redis',
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
@@ -72,7 +81,9 @@ return [
             'after_commit' => false,
         ],
 
+
     ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -85,10 +96,12 @@ return [
     |
     */
 
+
     'batching' => [
         'database' => env('DB_CONNECTION', 'sqlite'),
         'table' => 'job_batches',
     ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -103,10 +116,15 @@ return [
     |
     */
 
+
     'failed' => [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', 'sqlite'),
+        'database' => env('DB_CONNECTION', 'pgsql'),
         'table' => 'failed_jobs',
     ],
 
+
 ];
+
+
+
