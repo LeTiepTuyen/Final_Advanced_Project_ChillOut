@@ -100,7 +100,7 @@
           <NuxtLink to="/shoppingcart" class="flex items-center">
             <button class="relative md:block hidden" @mouseenter="isCartHover = true" @mouseleave="isCartHover = false">
               <span
-                class="absolute flex items-center justify-center -right-[3px] top-0 bg-[#FF4646] h-[17px] min-w-[17px] text-xs text-white px-0.5 rounded-full"
+                class="cart-count-badge absolute flex items-center justify-center -right-[3px] top-0 bg-[#FF4646] h-[17px] min-w-[17px] text-xs text-white px-0.5 rounded-full"
               >
                 {{ userStore.cart.length }}
               </span>
@@ -179,10 +179,32 @@ let searchSuggestions = ref([]);
 let noResultsTimeout = null;
 let showNoResults = ref(false);
 
+const searchBarRef = ref(null);
+
+
+const handleClickOutside = (event) => {
+  if (searchBarRef.value && !searchBarRef.value.contains(event.target)) {
+    showNoResults.value = false;
+  }
+};
+
+
+onMounted(() => {
+  // Add event listener when the component is mounted
+  document.addEventListener("click", handleClickOutside);
+});
+
+
+onBeforeUnmount(() => {
+  // Remove event listener when the component is about to unmount
+  document.removeEventListener("click", handleClickOutside);
+});
+
+
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
     router.push({ path: "/", query: { search: searchQuery.value } });
-    searchSuggestions.value = []; // Xóa ngay lập tức
+    searchSuggestions.value = false;
     showNoResults.value = false;
   }
 };
@@ -208,7 +230,8 @@ const fetchSuggestions = debounce(async (newQuery) => {
     searchSuggestions.value = [];
     showNoResults.value = false;
   }
-}, 300); 
+}, 300);
+
 
 watch(
   () => searchQuery.value,
@@ -218,6 +241,7 @@ watch(
     clearTimeout(noResultsTimeout);
   }
 );
+
 
 watch(
   () => searchSuggestions.value,
@@ -234,6 +258,7 @@ watch(
 const navigateToProduct = (id) => {
   router.push(`/item/${id}`);
 };
+
 
 const navigateToOrders = () => {
   router.push("/orders");
