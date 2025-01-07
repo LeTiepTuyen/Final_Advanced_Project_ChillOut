@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   pages: true,
+
   modules: [
     "nuxt-icon",
     "nuxt-lodash",
@@ -14,6 +15,7 @@ export default defineNuxtConfig({
       stripePk: process.env.STRIPE_PK_KEY,
     },
   },
+
   app: {
     head: {
       title: "Shopping Website",
@@ -27,5 +29,7 @@ export default defineNuxtConfig({
       script: [{ src: "https://js.stripe.com/v3/", defer: true }],
     },
   },
+
   devtools: { enabled: true },
+  compatibilityDate: "2025-01-07",
 });

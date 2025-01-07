@@ -78,6 +78,7 @@
 
 
           <button
+            id="add-to-cart-button"
             @click="addToCart()"
             :disabled="isInCart"
             class="mt-6 w-full px-6 py-3 rounded-lg text-white text-lg font-semibold bg-red-500 transition-transform transform hover:scale-105 disabled:opacity-50"

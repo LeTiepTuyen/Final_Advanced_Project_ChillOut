@@ -2,6 +2,7 @@
 
 
 use App\Models\Product;
+
 return [
 
 
@@ -225,6 +226,3 @@ return [
 
 
 ];
-
-
-
