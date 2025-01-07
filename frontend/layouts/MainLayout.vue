@@ -49,7 +49,6 @@
               <ul class="bg-white">
                 <li @click="navigateTo('/orders')" class="text-[13px] py-2 px-4 w-full hover:bg-gray-200">My Orders</li>
                 <li v-if="user" @click="logout" class="text-[13px] py-2 px-4 w-full hover:bg-gray-200"><Loading v-if="isLoading"/> Sign out</li>
-                
               </ul>
             </div>
           </li>
@@ -62,7 +61,7 @@
           <NuxtLink to="/" class="min-w-[170px]">
             <img width="130" src="/logo.png" alt="ShoppingWeb Logo" />
           </NuxtLink>
-          <div id="search-bar" class="max-w-[700px] w-full md:block hidden my-auto">
+          <div id="search-bar" ref="searchBarRef" class="max-w-[700px] w-full md:block hidden my-auto">
             <div class="relative">
               <div class="flex items-center border-2 border-[#FF4646] rounded-md w-full">
                 <input
@@ -120,7 +119,6 @@
       </div>
     </header>
 
-    
     <main class="lg:pt-[150px] md:pt-[130px] pt-[80px]">
       <slot />
     </main>
@@ -131,7 +129,7 @@
 <script setup>
 import { useUserStore } from "~/stores/user";
 import axios from "../src/axiosClient";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { debounce } from "lodash";
 import { watch } from "vue";
@@ -209,7 +207,6 @@ const handleSearch = () => {
   }
 };
 
-
 const fetchSuggestions = debounce(async (newQuery) => {
   if (newQuery.trim()) {
     isSearching.value = true;
@@ -253,7 +250,6 @@ watch(
     showNoResults.value = newSuggestions.length === 0;
   }
 );
-
 
 const navigateToProduct = (id) => {
   router.push(`/item/${id}`);
