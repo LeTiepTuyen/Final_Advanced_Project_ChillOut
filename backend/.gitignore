@@ -6,7 +6,6 @@
 /storage/*.key
 /storage/pail
 /vendor
-.env
 .env.backup
 .env.production
 .phpactor.json
@@ -22,3 +21,5 @@ yarn-error.log
 /.vscode
 /.zed
 /data.ms
+rr
+.rr.yaml

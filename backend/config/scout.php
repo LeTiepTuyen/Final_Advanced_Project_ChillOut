@@ -152,7 +152,7 @@ return [
 
     'meilisearch' => [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
-        'key' => env('MEILISEARCH_KEY'),
+        'key' => env('MEILISEARCH_KEY', 'masterKey'),
         'index-settings' => [
             Product::class => [
                 'filterableAttributes' => ['title', 'description', 'short_description'],
