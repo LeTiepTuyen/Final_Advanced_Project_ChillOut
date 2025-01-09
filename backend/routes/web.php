@@ -19,6 +19,7 @@ Route::get('/test-500', function () {
 });
 
 
+
 // Fallback Route: xử lý 404 cho route không tồn tại
 Route::fallback(function () {
     Log::warning('404 Not Found', [
