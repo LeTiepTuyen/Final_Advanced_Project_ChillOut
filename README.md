@@ -56,79 +56,71 @@ Before running this project, ensure you have the following installed:
 - [Docker](https://docker.com)
 
 ## Project Flow
-
+   You can see our Project Flow Chart by click this [Link](./FlowChart/FLowChart_FinalWeb.png)
 
 ## Setup Instructions
+   There are 2 ways to run the project, and there are 2 branches corresponding to these 2 ways:
+### 1. Use Docker Container for backend and local environment for frontend:
+----------------------
+   Follow README.md in this branch [main-backend-docker](https://github.com/LeTiepTuyen/Final_Advanced_Project_ChillOut/tree/main-backend-docker)
 
+   
+### 2. Use localhost environment for both backend and frontend(main branch):
+----------------------
 ### Backend (Laravel + PostgreSQL)
    We use Laravel Sail to Dockerize the entire Laravel backend, which isolates the development environment, independent of the local machine's environment. It integrates and communicates with other services (PgSQL, Redis, Meilisearch, etc.) through the Docker network, providing a standardized development environment for the entire backend.
+
 1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/LeTiepTuyen/Final_Advanced_Project_ChillOut.git
    cd ./backend
-
-
 2. **Create a .env file from the example:**
 
    ```bash
    cp .env.example .env
-
 3. **Install dependencies:**
 
    ```bash
    composer install
-
 4. **Generate the APP_KEY:**
 
    ```bash
    php artisan key:generate
-
 5. **Run migrations and seeders:**
 
    ```bash
    php artisan migrate --seed
-
 6. **Start the Meilisearch by docker:**
    If you don'd have docker, please download on this [link](https://docker.com) and open it.
 
    ```bash
    docker-compose up -d
-
 7. **Run laravel queue:**
    ```bash
    php artisan queue:work
-
 8. **Import data to Meilisearch:**
 
    ```bash
    php artisan scout:import 'App\Models\Product'
-
-9.  **Start the Laravel server:**
+9. **Start the Laravel Sever:**
 
    ```bash
    php artisan serve
-
-### 2\. Running the Frontend (Nuxt 3)
+### Running the Frontend (Nuxt 3)
 
 1. **Navigate to the frontend directory:**
 
    ```bash
    cd ./frontend
-
-
 2. **Install dependencies:**
 
    ```bash
    npm install
-
 3. **Start the development server:**
 
    ```bash
    npm run dev
-
-
-
 Note: Resetting the database is generally not required unless specifically needed for development purposes.
 
 ## Contributors
