@@ -56,8 +56,11 @@ Before running this project, ensure you have the following installed:
 - [Docker](https://docker.com)
 
 ## Project Flow
-   You can see our Project Flow Chart by click this [Link](./FlowChart/FLowChart_FinalWeb.png)
+Here is our Project Flow Chart:
 
+![Flow Chart](./FlowChart/FLowChart_FinalWeb.png)
+   
+[Click here to download the Flow Chart](./FlowChart/FLowChart_FinalWeb.png)
 ## Setup Instructions
    There are 2 ways to run the project, and there are 2 branches corresponding to these 2 ways:
 ### 1. Use Docker Container for backend and local environment for frontend:
