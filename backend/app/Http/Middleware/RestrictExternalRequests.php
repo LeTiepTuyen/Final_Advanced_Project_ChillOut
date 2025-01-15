@@ -9,7 +9,7 @@ class RestrictExternalRequests
 {
     public function handle(Request $request, Closure $next)
     {
-        $trustedDomains = ['localhost:3000', 'localhost:8000'];
+        $trustedDomains = ['localhost:3000', 'localhost:8000', 'host.docker.internal:3000'];
         $originHeader = $request->headers->get('origin');
 
         if ($originHeader) {
