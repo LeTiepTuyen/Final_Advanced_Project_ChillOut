@@ -64,7 +64,7 @@ return [
         ],
 
         'database' => [
-            'connection' => env('PULSE_DB_CONNECTION'),
+            'connection' => env('PULSE_DB_CONNECTION', 'pgsql'),
             'chunk' => 1000,
         ],
     ],
@@ -81,9 +81,9 @@ return [
     */
 
     'ingest' => [
-        'driver' => env('PULSE_INGEST_DRIVER', 'storage'),
+        'driver' => env('PULSE_INGEST_DRIVER', 'redis'),
 
-        'buffer' => env('PULSE_INGEST_BUFFER', 5_000),
+        'buffer' => env('PULSE_INGEST_BUFFER', 10_000),
 
         'trim' => [
             'lottery' => [1, 1_000],
@@ -91,7 +91,7 @@ return [
         ],
 
         'redis' => [
-            'connection' => env('PULSE_REDIS_CONNECTION'),
+            'connection' => env('PULSE_REDIS_CONNECTION', 'pulse'),
             'chunk' => 1000,
         ],
     ],
@@ -107,7 +107,7 @@ return [
     |
     */
 
-    'cache' => env('PULSE_CACHE_DRIVER'),
+    'cache' => env('PULSE_CACHE_DRIVER', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -168,7 +168,7 @@ return [
 
         Recorders\Servers::class => [
             'server_name' => env('PULSE_SERVER_NAME', gethostname()),
-            'directories' => explode(':', env('PULSE_SERVER_DIRECTORIES', '/')),
+            'directories' => explode(':', env('PULSE_SERVER_DIRECTORIES','/var/www/html')),
         ],
 
         Recorders\SlowJobs::class => [
