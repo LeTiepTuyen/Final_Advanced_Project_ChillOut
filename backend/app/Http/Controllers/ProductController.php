@@ -17,25 +17,23 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = $request->get('query', '');
-        $cacheKey = 'products_' . md5($query);
+        $cacheKey = 'products_' . hash('sha256', $query ?: 'default');
+
+        Log::info("Using Redis cache connection: " . env('REDIS_CACHE_CONNECTION'));
 
 
-        $products = Cache::get($cacheKey);
+        $products = Cache::store('redis')->get($cacheKey);
 
         if (!$products) {
-
             Log::info("Cache miss: Retrieving products from database");
 
             if ($query) {
-
                 $products = Product::search($query)->paginate(50);
             } else {
-
                 $products = Product::query()->paginate(50);
             }
 
-
-            Cache::put($cacheKey, $products, 600);
+            Cache::store('redis')->put($cacheKey, $products, 600);
             Log::info("Cache miss: Products saved to cache");
         } else {
             Log::info("Cache hit: Retrieved products from cache");
@@ -43,6 +41,7 @@ class ProductController extends Controller
 
         return ProductResource::collection($products);
     }
+
 
     public function show($id)
     {
